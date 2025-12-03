@@ -1,0 +1,24 @@
+stages:
+  prepare_data:
+    cmd: python src/nlp_prep.py
+    deps:
+    - data/raw/data.csv
+    - src/nlp_prep.py
+    outs:
+    - data/processed/comentarios_limpios.csv
+  topic_model:
+    cmd: python src/modeling.py
+    deps:
+    - data/processed/comentarios_limpios.csv
+    - src/modeling.py
+    outs:
+    - data/processed/comentarios_con_topico.csv
+    - models/lda_model.pkl
+    - models/tfidf_vectorizer.pkl
+  prioritize:
+    cmd: python src/priori.py
+    deps:
+    - data/processed/comentarios_con_topico.csv
+    - src/priori.py
+    outs:
+    - data/processed/topicos_priorizados.csv
