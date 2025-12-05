@@ -1,0 +1,4 @@
+[core]
+    remote = voce-project-pd
+['remote "voce-project-pd"']
+    url = https://github.com/braquec/voce-project-pd.git

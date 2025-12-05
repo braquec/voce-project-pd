@@ -42,7 +42,7 @@ def clean_text(text: str) -> str:
     words = text.split()
     words = [word for word in words if word not in SPANISH_STOP_WORDS]
     #words = [SPANISH_STEMMER.stem(word) for word in words]
-    
+
     return " ".join(words)
 
 def main():
@@ -58,7 +58,7 @@ def main():
     try:
         df = pd.read_csv(INPUT_PATH)
     except FileNotFoundError:
-        logging.error(f"Archivo no encontrado en {INPUT_PATH}. Asegúrate de que el dataset esté allí.")
+        logging.error(f"Archivo no encontrado en {INPUT_PATH}.")
         sys.exit(1)
 
     # selecciono columnas y eliminar nulos en el texto
