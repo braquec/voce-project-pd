@@ -70,5 +70,6 @@ Utilizar el endpoint `POST /predict_topic` para parobar cualquier comentario de 
 
 ## Autor (es)
 
-*[Berner Raquec](https://github.com/braquec)* - <25002780@galileo.edu>  
-*[Oscar Vera](https://github.com/braquec)* - <25002780@galileo.edu>
+*[Berner Raquec](https://ges.galileo.edu/dotlrn/community%2dmember?user_id=594467771)* - <25002780@galileo.edu>  
+*[Oscar Vera](https://ges.galileo.edu/dotlrn/community%2dmember?user_id=127485406)* - <09006036@galileo.edu>  
+*[Hugo Castillo](https://ges.galileo.edu/dotlrn/community%2dmember?user_id=128061266)* - <danilocastillo@galileo.edu>
