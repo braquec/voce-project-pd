@@ -17,34 +17,24 @@ def main():
         logging.error(f"Archivo no encontrado en {INPUT_PATH}. Verifica que la Fase 3 haya corrido correctamente.")
         sys.exit(1)
 
-    # Asegurarse de que la columna de tópico sea numérica (por si se guardó como texto)
+    # validar que la columna sea numérica
     df['topico_principal'] = pd.to_numeric(df['topico_principal'], errors='coerce')
     
-    # 1. Agregación de Métricas por Tópico
     logging.info("Calculando métricas de agregación por tópico...")
     prioridad_df = df.groupby('topico_principal').agg(
-        volumen=('topico_principal', 'count'),  # Conteo de comentarios por tópico
-        satisfaccion_media=('calificacion', 'mean') # Puntuación media
+        volumen=('topico_principal', 'count'),  # conteo de comentarios
+        satisfaccion_media=('calificacion', 'mean') # media de calificación
     ).reset_index()
 
-    # 2. Cálculo de la Métrica de Riesgo/Prioridad
-    
-    # Normalizar la puntuación media (asumiendo escala 1-10 o similar) 
-    # Si la escala es del 1 al 10, 'insatisfaccion' será (10 - puntuacion)
-    # Si la escala es del 0 al 5, puedes normalizar entre 0 y 1 para calcular la insatisfacción.
-    # Usaremos una simple inversa: (Valor Máximo - Satisfacción Media). Ajusta el valor 50 si tu escala no es 1-10.
-    
+    # Cálculo de la Métrica de Riesgo/Prioridad
+    # normalizo la puntuación media
     max_satisfaccion = df['calificacion'].max()
     prioridad_df['insatisfaccion_normalizada'] = (max_satisfaccion - prioridad_df['satisfaccion_media']) / max_satisfaccion
     
-    # Prioridad = Insatisfacción * Volumen.
-    # Esto penaliza fuertemente los temas donde mucha gente está insatisfecha.
+    # para calcular la prioridad = Insatisfacción * Volumen.
+    # para penalizar los temas donde mucha gente está insatisfecha.
     prioridad_df['prioridad_score'] = prioridad_df['insatisfaccion_normalizada'] * prioridad_df['volumen']
     
-    # Opcional: Obtener las 5 palabras clave para nombrar el tópico (requiere cargar el vectorizador y el modelo)
-    # Para simplicidad en este script, solo guardaremos las métricas.
-    
-    # 3. Ordenar y Guardar
     prioridad_df = prioridad_df.sort_values(by='prioridad_score', ascending=False)
     
     prioridad_df.to_csv(OUTPUT_PATH, index=False)

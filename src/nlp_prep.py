@@ -5,8 +5,8 @@ from nltk.corpus import stopwords
 import yaml
 import sys
 import logging
+from nltk.stem.snowball import SnowballStemmer
 
-# Configuración de Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # solo la primera vez lo descarga
@@ -16,6 +16,7 @@ except nltk.downloader.DownloadError:
     nltk.download('stopwords')
 
 SPANISH_STOP_WORDS = set(stopwords.words('spanish'))
+SPANISH_STEMMER = SnowballStemmer("spanish")
 
 def load_params():
     """Lectura desde params.yaml."""
@@ -28,19 +29,19 @@ def clean_text(text: str) -> str:
         return ""
     
     text = text.lower()
-    
     # eliminar URLs
     text = re.sub(r'http\S+', '', text)
     
     # eliminar puntuación, números y caracteres especiales (excepto espacios)
     text = re.sub(r'[^a-záéíóúüñ\s]', '', text)
-    
+
     # eliminar espacios múltiples
     text = re.sub(r'\s+', ' ', text).strip()
     
     # eliminar Stop Words
     words = text.split()
     words = [word for word in words if word not in SPANISH_STOP_WORDS]
+    #words = [SPANISH_STEMMER.stem(word) for word in words]
     
     return " ".join(words)
 
@@ -50,8 +51,8 @@ def main():
     
     INPUT_PATH = 'data/raw/data.csv'
     OUTPUT_PATH = 'data/processed/comentarios_limpios.csv'
-    TEXT_COLUMN = 'texto' # Asegúrate de que este sea el nombre correcto de tu columna
-    TARGET_COLUMN = 'calificacion' # La columna de satisfacción
+    TEXT_COLUMN = 'texto'
+    TARGET_COLUMN = 'calificacion'
     
     logging.info(f"Cargando datos desde: {INPUT_PATH}")
     try:
@@ -66,7 +67,7 @@ def main():
     logging.info("Aplicando limpieza de texto...")
     df_clean['texto_limpio'] = df_clean[TEXT_COLUMN].apply(clean_text)
     
-    # eliminar filas donde el texto limpio quedó vacío (ej: solo contenía números/stop words)
+    # elimino filas con texto vacio
     df_clean = df_clean[df_clean['texto_limpio'] != ""].reset_index(drop=True)
 
     # guardar el output

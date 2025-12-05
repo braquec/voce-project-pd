@@ -1,0 +1,58 @@
+schema: '2.0'
+stages:
+  prepare_data:
+    cmd: python src/nlp_prep.py
+    deps:
+    - path: data/raw/data.csv
+      hash: md5
+      md5: 595df62263471ae1c1322e5c438cd2a1
+      size: 3477195
+    - path: src/nlp_prep.py
+      hash: md5
+      md5: bf8c7ee09fdc17d5ca627cc48f2f1d9a
+      size: 2561
+    outs:
+    - path: data/processed/comentarios_limpios.csv
+      hash: md5
+      md5: 730a703bd6a6fdf1993d4815f1b64ebd
+      size: 1606426
+  topic_model:
+    cmd: python src/modeling.py
+    deps:
+    - path: data/processed/comentarios_limpios.csv
+      hash: md5
+      md5: 730a703bd6a6fdf1993d4815f1b64ebd
+      size: 1606426
+    - path: src/modeling.py
+      hash: md5
+      md5: b0b9cd5b09594bc1eb250fa129ac28e7
+      size: 3194
+    outs:
+    - path: data/processed/comentarios_con_topico.csv
+      hash: md5
+      md5: f8538de43540692e88af1cde39cb33d3
+      size: 1643793
+    - path: models/lda_model.pkl
+      hash: md5
+      md5: fe7b66d68fe6ad4aa2fcf5008aaa950b
+      size: 673407
+    - path: models/tfidf_vectorizer.pkl
+      hash: md5
+      md5: 4c7147cdc1afc67004f407570bff5e5c
+      size: 67775
+  prioritize:
+    cmd: python src/priori.py
+    deps:
+    - path: data/processed/comentarios_con_topico.csv
+      hash: md5
+      md5: f8538de43540692e88af1cde39cb33d3
+      size: 1643793
+    - path: src/priori.py
+      hash: md5
+      md5: 2ee85fa02472cd5eb8e0d49a2eaea894
+      size: 1907
+    outs:
+    - path: data/processed/topicos_priorizados.csv
+      hash: md5
+      md5: 4d00df9232c6526687b665c6849a3d6c
+      size: 1018

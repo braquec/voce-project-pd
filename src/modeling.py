@@ -21,7 +21,7 @@ def main():
     VECTORIZER_PATH = 'models/tfidf_vectorizer.pkl'
     MODEL_PATH = 'models/lda_model.pkl'
     
-    # Parámetros del modelo (cargados desde params.yaml)
+    # parámetros
     N_TOPICS = params.get('n_topics', 15)
     MIN_DF = params.get('min_df', 5)
     
@@ -32,19 +32,18 @@ def main():
         logging.error(f"Archivo no encontrado en {INPUT_PATH}. Ejecuta 'dvc repro' primero.")
         sys.exit(1)
 
-    # Rellenar cualquier valor nulo restante en la columna de texto con una cadena vacía.
-    # Esto evita que TfidfVectorizer reciba un np.nan.
+    # relleno valores nulos
     df['texto_limpio'] = df['texto_limpio'].fillna('')
     
-    # 1. Vectorización (TF-IDF)
+    # Vectorización (TF-IDF)
     logging.info(f"Iniciando vectorización con TF-IDF. Mínima frecuencia en documento (min_df): {MIN_DF}")
     
-    # TFIDF convierte el texto en valores numéricos ponderados.
+    # TFIDF para convertir el texto en valores numericos
     vectorizer = TfidfVectorizer(
-        max_df=0.95,       # Ignora términos que aparecen en más del 95% de los documentos
+        max_df=0.95,       # ignorar terminos que aparecen  más del 95% de los documentos
         min_df=MIN_DF,     # Ignora términos que aparecen en menos de MIN_DF documentos (útil para ruido)
-        stop_words=None,   # Ya se eliminaron en la fase anterior
-        ngram_range=(1, 2) # Considera palabras solas y pares de palabras (bigramas)
+        stop_words=None,   
+        ngram_range=(1, 2)
     )
     
     # La matriz DTM es la representación numérica del texto
@@ -52,23 +51,21 @@ def main():
     
     logging.info(f"DTM creado: {dtm.shape[0]} documentos (comentarios), {dtm.shape[1]} términos (palabras/bigramas)")
     
-    # 2. Entrenamiento del Modelo LDA
+    # Entrenamiento del Modelo LDA
     logging.info(f"Entrenando modelo LDA con {N_TOPICS} tópicos...")
     
     lda = LatentDirichletAllocation(
         n_components=N_TOPICS,
         random_state=42,
-        learning_method='batch', # Método de entrenamiento
-        max_iter=10,             # Número de iteraciones
-        n_jobs=-1                # Usa todos los núcleos de CPU disponibles
+        learning_method='batch', # método
+        max_iter=10,             # iteraciones
+        n_jobs=-1                
     )
-    
-    # Entrenar el modelo
+ 
     lda.fit(dtm)
     
-    # 3. Guardar Artefactos
-    
-    # El vectorizador es crucial para transformar nuevos comentarios en el futuro
+    # Guardar Artefactos
+    # vectorizador para transformar nuevos comentarios en el futuro
     with open(VECTORIZER_PATH, 'wb') as f:
         pickle.dump(vectorizer, f)
     logging.info(f"Vectorizer guardado en: {VECTORIZER_PATH}")
